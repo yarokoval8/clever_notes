@@ -128,7 +128,7 @@ def add_note():
             print("Додано нотатку:", note)
             save_notes_to_json()
 
-def add_teg():
+def add_tag():
     if list_notes.selectedItems():
         key = list_notes.selectedItems()[0].text()
         tag = field_tag.text()
@@ -144,13 +144,61 @@ def add_teg():
     else:
         print('Необрано нотатки для додавання тегу!:')
 
+def del_tag():
+    if list_notes.selectedItem() and list_tags.selectedItem():
+        key_note = list_notes.selectedItem()[0].text()
+        for note in notes:
+            if note['name'] == key_note:
+                note['tags'].remove(list_tags.selectedItem()[0].text())
+                list_tags.takeItem(list_tags.row(list_tags.selectedItem()[0]))
+                save_notes_to_json()
+                print('Тег видалено з нотатки')
+            else:
+                print("Необрано нотатки для видалення тегу")
 
+def search_tag():
+    tag = field_tag.text()
+    if button_tag_search.text() == 'Шукати нотатки за тегом' and tag:
+        notes_filtered = [note for note in notes if tag in note['tags']]
+        list_notes.clear()
+        list_tags.clear()
+        list_tags.clear()
+        for note in notes_filtered:
+            list_notes.addItem(note['name'])
+        button_tag_search.setText("Скинути пошук")
+    elif button_tag_search.text() == "Скинути пошук":
+        field_tag.clear()
+        list_notes.clear()
+        list_tags.clear()
+        for note in notes:
+            list_notes.addItem(note['name'])
+        button_tag_search.setText("Шукати нотатки по тегу")
+    else:
+        pass
+style = '''
+    QPushButton {
+        color: white;
+        background-color: grey;
+        padding: 7px 7px;
+        border-radius: 5px;
+    }
+    QPushButton:hover {
+        border: 5px #C6C6C6 colid;
+        background: #0892D0
+    }
+    QLabel {
+        font-size: 10pt;
+    }
+'''
+app.setStyleSheet(style)
 # обробка подій
 list_notes.itemClicked.connect(show_note)
 button_note_create.clicked.connect(add_note)
 button_save.clicked.connect(save_note)
 button_note_del.clicked.connect(del_note)
-button_tag_add.clicked.connect(add_teg)
+button_tag_add.clicked.connect(add_tag)
+button_tag_del.clicked.connect(del_tag)
+button_tag_search.clicked.connect(search_tag)
 # Старт застосунку
 notes_win.show()
 
